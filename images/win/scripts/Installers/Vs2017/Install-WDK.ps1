@@ -30,4 +30,25 @@ if ($wdkExitCode -ne 0)
     exit $wdkExitCode
 }
 
+# Need to install the VSIX to get the build targets when running VSBuild
+Write-Host 'Installing WDK.vsix'
+$process = Start-Process`
+    -FilePath 'C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\Common7\IDE\VSIXInstaller.exe'`
+    -ArgumentList ('/quiet', "C:\Program Files (x86)\Windows Kits\10\Vsix\WDK.vsix")`
+    -Wait`
+    -PassThru
+
+$exitCode = $process.ExitCode
+
+if ($exitCode -eq 0 -or $exitCode -eq 3010)
+{
+    Write-Host 'WDK.vsix installed successfully'
+    return $exitCode
+}
+else
+{
+    Write-Host "Nonzero exit code returned by the installation process: $exitCode."
+    return $exitCode
+}
+
 exit 0
